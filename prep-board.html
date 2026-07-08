@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Interview Prep Board — SDE2 2026</title>
+<style>
+  :root{
+    --bg:#101623; --card:#151D2E; --card2:#111827; --line:#232D42; --line2:#2A3550;
+    --txt:#DDE3EE; --txt2:#8B96AC; --dim:#6E7A93; --hi:#F2F5FB;
+    --blue:#5B79C7; --green:#4FBF8B; --amber:#E8A93D; --red:#E06C6C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 14px 60px}
+  .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-family:ui-monospace,monospace}
+  h1{margin:4px 0 2px;font-size:26px;font-weight:700;color:var(--hi)}
+  .sub{font-size:13px;color:var(--txt2)}
+  .tabs{display:flex;gap:8px;margin:14px 0}
+  .tab{flex:1;padding:10px 6px;border-radius:10px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt2);text-align:center}
+  .tab.on{border-color:var(--blue);background:#1B2740;color:var(--hi)}
+  .tab b{display:block;font-size:15px}
+  .tab span{font-size:11px;font-family:ui-monospace,monospace}
+  .prog{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .prognums{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;font-family:ui-monospace,monospace}
+  .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex}
+  .bar .g{background:var(--green);transition:width .3s}
+  .bar .a{background:var(--amber);transition:width .3s}
+  .filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .chip{padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--txt2)}
+  .chip.on{border-color:var(--blue);background:#1B2740;color:var(--hi)}
+  .ghead{width:100%;text-align:left;background:#1B2437;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:#C9D3E6;cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .ghead b{font-size:14px}
+  .ghead span{font-size:12px;font-family:ui-monospace,monospace;color:var(--dim)}
+  .card{background:var(--card);border:1px solid var(--line);border-left:3px solid #3A4763;border-radius:10px;padding:12px 14px;margin:8px 0;transition:opacity .2s}
+  .card.done{opacity:.62;border-color:#2C4A3C;border-left-color:var(--green)}
+  .card.review{border-color:#4A3D22;border-left-color:var(--amber)}
+  .row{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .title{color:#E8EDF7;font-weight:600;font-size:14.5px}
+  a.title{text-decoration:none;border-bottom:1px dotted var(--blue)}
+  .tags{margin-top:5px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pill{font-size:10.5px;font-family:ui-monospace,monospace;border-radius:4px;padding:1px 6px}
+  .pill.co{color:var(--txt2);background:#1E2942}
+  .btns{display:flex;gap:6px;flex-shrink:0}
+  .btn{width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px;border:1px solid var(--line2);background:#182136;color:var(--dim)}
+  .btn.don{border-color:var(--green);background:#1D3529;color:var(--green)}
+  .btn.rev{border-color:var(--amber);background:#33290F;color:var(--amber)}
+  .fu{margin-top:8px;font-size:12.5px;line-height:1.55;color:#9AA6BE;background:var(--card2);border-radius:8px;padding:8px 10px}
+  .fu b{color:var(--blue);font-family:ui-monospace,monospace;font-size:11px;font-weight:400}
+  .empty{text-align:center;color:var(--dim);padding:40px 0;font-size:14px}
+  button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">SDE2 · 2026 loop</div>
+  <h1>Interview Prep Board</h1>
+  <div class="sub">160 questions from recent Meta · Amazon · Google · Microsoft loops</div>
+  <div class="tabs" id="tabs"></div>
+  <div class="prog">
+    <div class="prognums">
+      <span style="color:var(--green)" id="nDone"></span>
+      <span style="color:var(--amber)" id="nRev"></span>
+      <span style="color:var(--dim)" id="nLeft"></span>
+    </div>
+    <div class="bar"><div class="g" id="barG"></div><div class="a" id="barA"></div></div>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</div>
+<script>
+const D = "Done", R = "Review";
+
+const dsa = [
+  // Arrays & Hashing (8)
+  { id:"d1", g:"Arrays & Hashing", t:"Two Sum", diff:"Easy", lc:"https://leetcode.com/problems/two-sum/", co:["Meta","Amazon"], fu:"Nice. Now what if the array is sorted — can you do O(1) space? And what if the data doesn't fit in memory?" },
+  { id:"d2", g:"Arrays & Hashing", t:"Product of Array Except Self", diff:"Medium", lc:"https://leetcode.com/problems/product-of-array-except-self/", co:["Meta","Microsoft"], fu:"You used two passes with an output array — can you drop the extra prefix/suffix arrays? And why can't you just use division?" },
+  { id:"d3", g:"Arrays & Hashing", t:"Merge Intervals", diff:"Medium", lc:"https://leetcode.com/problems/merge-intervals/", co:["Amazon","Google"], fu:"What if intervals arrive one at a time as a stream — how do you merge on the fly? What data structure keeps this efficient?" },
+  { id:"d4", g:"Arrays & Hashing", t:"Car Pooling", diff:"Medium", lc:"https://leetcode.com/problems/car-pooling/", co:["Amazon"], fu:"Your TreeMap solution is O(N log N). Can you get O(N) with a difference array? Now, what if trips are stored in a distributed DB?" },
+  { id:"d5", g:"Arrays & Hashing", t:"Top K Frequent Elements", diff:"Medium", lc:"https://leetcode.com/problems/top-k-frequent-elements/", co:["Amazon","Meta"], fu:"Heap gives O(n log k). Can you beat that with bucket sort? What changes if the input is a stream?" },
+  { id:"d6", g:"Arrays & Hashing", t:"Subarray Sum Equals K", diff:"Medium", lc:"https://leetcode.com/problems/subarray-sum-equals-k/", co:["Meta","Google"], fu:"Why doesn't sliding window work here? What property of the input breaks it?" },
+  { id:"d7", g:"Arrays & Hashing", t:"Next Permutation", diff:"Medium", lc:"https://leetcode.com/problems/next-permutation/", co:["Meta"], fu:"Do it in place with constant memory. Now write previous permutation — what flips in your logic?" },
+  { id:"d8", g:"Arrays & Hashing", t:"Group Anagrams", diff:"Medium", lc:"https://leetcode.com/problems/group-anagrams/", co:["Amazon","Google"], fu:"Sorting each word is O(k log k) — can you build the key in O(k)? What are the trade-offs of a count-array key?" },
+
+  // Two Pointers (6)
+  { id:"d9", g:"Two Pointers", t:"Valid Palindrome II", diff:"Easy", lc:"https://leetcode.com/problems/valid-palindrome-ii/", co:["Meta"], fu:"Good. Now generalize: what if you can delete up to K characters? (This is Valid Palindrome III — Meta loves this chain.)" },
+  { id:"d10", g:"Two Pointers", t:"3Sum", diff:"Medium", lc:"https://leetcode.com/problems/3sum/", co:["Meta","Amazon"], fu:"How do you avoid duplicate triplets without a set? What's the complexity, and can we do better than O(n²)?" },
+  { id:"d11", g:"Two Pointers", t:"Container With Most Water", diff:"Medium", lc:"https://leetcode.com/problems/container-with-most-water/", co:["Google"], fu:"Prove the two-pointer move is safe — why can we discard the shorter line without missing the answer?" },
+  { id:"d12", g:"Two Pointers", t:"Trapping Rain Water", diff:"Hard", lc:"https://leetcode.com/problems/trapping-rain-water/", co:["Amazon"], fu:"You used prefix max arrays. Can you do O(1) space with two pointers? What about the 2D version?" },
+  { id:"d13", g:"Two Pointers", t:"Move Zeroes", diff:"Easy", lc:"https://leetcode.com/problems/move-zeroes/", co:["Meta"], fu:"Minimize the total number of writes. What if we care about cache locality on a huge array?" },
+  { id:"d14", g:"Two Pointers", t:"Merge Sorted Array", diff:"Easy", lc:"https://leetcode.com/problems/merge-sorted-array/", co:["Meta"], fu:"Why merge from the back? What if the arrays are on disk and don't fit in memory?" },
+
+  // Sliding Window (4)
+  { id:"d15", g:"Sliding Window", t:"Longest Substring Without Repeating Characters", diff:"Medium", lc:"https://leetcode.com/problems/longest-substring-without-repeating-characters/", co:["Amazon","Meta"], fu:"What if it's a unicode stream instead of ASCII? Now return the substring itself, not just the length." },
+  { id:"d16", g:"Sliding Window", t:"Minimum Window Substring", diff:"Hard", lc:"https://leetcode.com/problems/minimum-window-substring/", co:["Google","Meta"], fu:"Walk me through when you shrink the window. How do you check 'window is valid' in O(1) per step?" },
+  { id:"d17", g:"Sliding Window", t:"Max Consecutive Ones III", diff:"Medium", lc:"https://leetcode.com/problems/max-consecutive-ones-iii/", co:["Meta"], fu:"Can you solve it without ever shrinking the window? Why does a non-shrinking window still give the right answer?" },
+  { id:"d18", g:"Sliding Window", t:"Sliding Window Maximum", diff:"Hard", lc:"https://leetcode.com/problems/sliding-window-maximum/", co:["Amazon","Google"], fu:"Why a monotonic deque instead of a heap? Compare the amortized costs." },
+
+  // Binary Search (5)
+  { id:"d19", g:"Binary Search", t:"Search in Rotated Sorted Array", diff:"Medium", lc:"https://leetcode.com/problems/search-in-rotated-sorted-array/", co:["Amazon","Microsoft"], fu:"What breaks when duplicates are allowed? What's the worst-case complexity then?" },
+  { id:"d20", g:"Binary Search", t:"Find First and Last Position of Element", diff:"Medium", lc:"https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/", co:["Google"], fu:"Write both boundary searches with one helper. Where exactly do off-by-one bugs hide in your loop condition?" },
+  { id:"d21", g:"Binary Search", t:"Koko Eating Bananas", diff:"Medium", lc:"https://leetcode.com/problems/koko-eating-bananas/", co:["Google"], fu:"You're binary searching the answer space — how did you know that's valid here? What property must the predicate have?" },
+  { id:"d22", g:"Binary Search", t:"Random Pick with Weight", diff:"Medium", lc:"https://leetcode.com/problems/random-pick-with-weight/", co:["Meta"], fu:"pickIndex is called millions of times — justify prefix sums + binary search. Now, what if weights update frequently?" },
+  { id:"d23", g:"Binary Search", t:"Median of Two Sorted Arrays", diff:"Hard", lc:"https://leetcode.com/problems/median-of-two-sorted-arrays/", co:["Google","Microsoft"], fu:"Explain the partition invariant. Why do we binary search the smaller array?" },
+
+  // Stack (6)
+  { id:"d24", g:"Stack", t:"Valid Parentheses", diff:"Easy", lc:"https://leetcode.com/problems/valid-parentheses/", co:["Amazon","Meta"], fu:"What if the string is huge and streamed — can you validate with O(1) memory for a single bracket type?" },
+  { id:"d25", g:"Stack", t:"Minimum Remove to Make Valid Parentheses", diff:"Medium", lc:"https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/", co:["Meta"], fu:"Can you do it in one forward pass plus cleanup? Interviewers here push hard for minimal passes and no stack of indices." },
+  { id:"d26", g:"Stack", t:"Basic Calculator II", diff:"Medium", lc:"https://leetcode.com/problems/basic-calculator-ii/", co:["Meta"], fu:"Now do it without the stack — O(1) space. Then: how would you add parentheses support?" },
+  { id:"d27", g:"Stack", t:"Daily Temperatures", diff:"Medium", lc:"https://leetcode.com/problems/daily-temperatures/", co:["Amazon"], fu:"Why is the monotonic stack O(n) total despite the inner while loop? Argue amortized cost." },
+  { id:"d28", g:"Stack", t:"Next Greater Element I", diff:"Easy", lc:"https://leetcode.com/problems/next-greater-element-i/", co:["Amazon"], fu:"Extend it: the array is circular — what changes? (Amazon asked the monotonic-stack family recently.)" },
+  { id:"d29", g:"Stack", t:"Simplify Path", diff:"Medium", lc:"https://leetcode.com/problems/simplify-path/", co:["Meta"], fu:"What edge cases did you consider — multiple slashes, trailing '..' past root? How would you handle symlinks conceptually?" },
+
+  // Linked List (5)
+  { id:"d30", g:"Linked List", t:"Reverse Linked List", diff:"Easy", lc:"https://leetcode.com/problems/reverse-linked-list/", co:["Amazon","Microsoft"], fu:"Now reverse in groups of K. Iterative or recursive — defend your choice for production code." },
+  { id:"d31", g:"Linked List", t:"Merge K Sorted Lists", diff:"Hard", lc:"https://leetcode.com/problems/merge-k-sorted-lists/", co:["Amazon","Meta"], fu:"Compare heap vs divide-and-conquer. What if the lists come from K network streams with backpressure?" },
+  { id:"d32", g:"Linked List", t:"LRU Cache", diff:"Medium", lc:"https://leetcode.com/problems/lru-cache/", co:["Amazon","Microsoft"], fu:"Make it thread-safe — where do you lock? Then: how does LFU change your data structures?" },
+  { id:"d33", g:"Linked List", t:"Copy List with Random Pointer", diff:"Medium", lc:"https://leetcode.com/problems/copy-list-with-random-pointer/", co:["Amazon","Meta"], fu:"You used a hash map — now do O(1) extra space with node interleaving." },
+  { id:"d34", g:"Linked List", t:"Add Two Numbers", diff:"Medium", lc:"https://leetcode.com/problems/add-two-numbers/", co:["Microsoft"], fu:"What if digits are stored most-significant first and you can't reverse the lists?" },
+
+  // Trees (10)
+  { id:"d35", g:"Trees", t:"Binary Tree Right Side View", diff:"Medium", lc:"https://leetcode.com/problems/binary-tree-right-side-view/", co:["Meta"], fu:"Variant Meta asked: return the ZigZag view — alternate left/right node per level. DFS or BFS, and why?" },
+  { id:"d36", g:"Trees", t:"Binary Tree Vertical Order Traversal", diff:"Medium", lc:"https://leetcode.com/problems/binary-tree-vertical-order-traversal/", co:["Meta"], fu:"Why BFS over DFS here? What ordering guarantee breaks with DFS, and how would you fix it?" },
+  { id:"d37", g:"Trees", t:"Lowest Common Ancestor of a Binary Tree", diff:"Medium", lc:"https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/", co:["Meta","Amazon"], fu:"Follow-up chain: what if nodes have parent pointers (LCA III)? What if one node might not exist in the tree (LCA II)?" },
+  { id:"d38", g:"Trees", t:"Diameter of Binary Tree", diff:"Easy", lc:"https://leetcode.com/problems/diameter-of-binary-tree/", co:["Meta","Google"], fu:"Return the actual path, not just the length. How does your recursion change?" },
+  { id:"d39", g:"Trees", t:"Validate Binary Search Tree", diff:"Medium", lc:"https://leetcode.com/problems/validate-binary-search-tree/", co:["Amazon"], fu:"Why does checking only node vs children fail? Show a counterexample, then fix with ranges or inorder." },
+  { id:"d40", g:"Trees", t:"Kth Smallest Element in a BST", diff:"Medium", lc:"https://leetcode.com/problems/kth-smallest-element-in-a-bst/", co:["Amazon"], fu:"The BST gets frequent inserts and deletes and kth is queried constantly — how do you augment the nodes?" },
+  { id:"d41", g:"Trees", t:"Serialize and Deserialize Binary Tree", diff:"Hard", lc:"https://leetcode.com/problems/serialize-and-deserialize-binary-tree/", co:["Amazon","Microsoft"], fu:"Your format uses null markers — how does the answer change for a BST where you can drop them?" },
+  { id:"d42", g:"Trees", t:"Range Sum of BST", diff:"Easy", lc:"https://leetcode.com/problems/range-sum-of-bst/", co:["Meta"], fu:"Where exactly do you prune, and what's the complexity in terms of nodes actually visited?" },
+  { id:"d43", g:"Trees", t:"Binary Tree Zigzag Level Order Traversal", diff:"Medium", lc:"https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/", co:["Microsoft"], fu:"Can you avoid reversing lists per level? Deque vs index-insert — trade-offs?" },
+  { id:"d44", g:"Trees", t:"Sum Root to Leaf Numbers", diff:"Medium", lc:"https://leetcode.com/problems/sum-root-to-leaf-numbers/", co:["Meta"], fu:"Do it iteratively. What if numbers overflow a 64-bit int — how would you report results?" },
+
+  // Graphs (10)
+  { id:"d45", g:"Graphs", t:"Number of Islands", diff:"Medium", lc:"https://leetcode.com/problems/number-of-islands/", co:["Amazon","Google"], fu:"Grid is too large for memory — what now? Also compare DFS vs BFS vs Union-Find for this." },
+  { id:"d46", g:"Graphs", t:"Making a Large Island", diff:"Hard", lc:"https://leetcode.com/problems/making-a-large-island/", co:["Meta"], fu:"Showed up in a Meta phone screen. How do you avoid double-counting when a flipped cell touches the same island twice?" },
+  { id:"d47", g:"Graphs", t:"Minimum Number of Days to Disconnect Island", diff:"Hard", lc:"https://leetcode.com/problems/minimum-number-of-days-to-disconnect-island/", co:["Amazon"], fu:"Why is the answer always ≤ 2? Prove it — that insight is what the interviewer is fishing for." },
+  { id:"d48", g:"Graphs", t:"Rotting Oranges", diff:"Medium", lc:"https://leetcode.com/problems/rotting-oranges/", co:["Amazon","Google"], fu:"Why multi-source BFS and not DFS? What would you change if rot spreads at different speeds per cell?" },
+  { id:"d49", g:"Graphs", t:"Clone Graph", diff:"Medium", lc:"https://leetcode.com/problems/clone-graph/", co:["Meta","Google"], fu:"What if the graph is too big for recursion — iterative version? And how do you handle cycles safely?" },
+  { id:"d50", g:"Graphs", t:"Course Schedule II", diff:"Medium", lc:"https://leetcode.com/problems/course-schedule-ii/", co:["Google","Amazon"], fu:"Google asked topological sort recently. Kahn's vs DFS-based — when does each fail to detect a cycle cleanly?" },
+  { id:"d51", g:"Graphs", t:"Accounts Merge", diff:"Medium", lc:"https://leetcode.com/problems/accounts-merge/", co:["Meta"], fu:"Justify Union-Find over DFS at scale. What do path compression and union by rank buy you here?" },
+  { id:"d52", g:"Graphs", t:"Word Ladder", diff:"Hard", lc:"https://leetcode.com/problems/word-ladder/", co:["Amazon","Google"], fu:"Optimize with bidirectional BFS — when do you stop, and why does it cut the branching factor?" },
+  { id:"d53", g:"Graphs", t:"Shortest Path in Binary Matrix", diff:"Medium", lc:"https://leetcode.com/problems/shortest-path-in-binary-matrix/", co:["Meta"], fu:"Meta variant: return the path itself, not just its length. How do you reconstruct it without storing full paths in the queue?" },
+  { id:"d54", g:"Graphs", t:"Evaluate Division (Currency Conversion)", diff:"Medium", lc:"https://leetcode.com/problems/evaluate-division/", co:["Amazon"], fu:"Asked at Amazon as: given a file of FX rates, find the rate between two arbitrary currencies. Follow-up: pick the best rate when multiple paths exist — what algorithm now?" },
+
+  // Heap & Greedy (6)
+  { id:"d55", g:"Heap & Greedy", t:"Kth Largest Element in an Array", diff:"Medium", lc:"https://leetcode.com/problems/kth-largest-element-in-an-array/", co:["Meta","Amazon"], fu:"Quickselect is O(n) average — what's the worst case and how do you defend against it? Now handle a stream." },
+  { id:"d56", g:"Heap & Greedy", t:"K Closest Points to Origin", diff:"Medium", lc:"https://leetcode.com/problems/k-closest-points-to-origin/", co:["Meta","Amazon"], fu:"Why a max-heap of size K and not a min-heap of size N? When would quickselect be the wrong choice?" },
+  { id:"d57", g:"Heap & Greedy", t:"Find Median from Data Stream", diff:"Hard", lc:"https://leetcode.com/problems/find-median-from-data-stream/", co:["Amazon","Google"], fu:"How do you keep the two heaps balanced? Follow-up: median over a sliding window; then approximate median at web scale." },
+  { id:"d58", g:"Heap & Greedy", t:"Meeting Rooms II", diff:"Medium", lc:"https://leetcode.com/problems/meeting-rooms-ii/", co:["Amazon","Google"], fu:"Now return the actual room assignment per meeting, not just the count." },
+  { id:"d59", g:"Heap & Greedy", t:"Task Scheduler", diff:"Medium", lc:"https://leetcode.com/problems/task-scheduler/", co:["Amazon"], fu:"Appeared in an Amazon OA. Follow-up: output the actual schedule order, not just the total time." },
+  { id:"d60", g:"Heap & Greedy", t:"Top K Frequent Words", diff:"Medium", lc:"https://leetcode.com/problems/top-k-frequent-words/", co:["Microsoft"], fu:"Microsoft's version: top K error codes from log lines, frequency desc, ties ascending. How does the tie-break change your comparator?" },
+
+  // Backtracking (4)
+  { id:"d61", g:"Backtracking", t:"Subsets", diff:"Medium", lc:"https://leetcode.com/problems/subsets/", co:["Amazon"], fu:"Now the input has duplicates — how do you skip duplicate subsets during the recursion, not after?" },
+  { id:"d62", g:"Backtracking", t:"Permutations", diff:"Medium", lc:"https://leetcode.com/problems/permutations/", co:["Microsoft"], fu:"What's the exact time complexity including the copy cost? Can you generate lazily, one permutation at a time?" },
+  { id:"d63", g:"Backtracking", t:"Combination Sum", diff:"Medium", lc:"https://leetcode.com/problems/combination-sum/", co:["Amazon"], fu:"How do you avoid emitting the same combination in different orders? Where's the pruning?" },
+  { id:"d64", g:"Backtracking", t:"Word Search", diff:"Medium", lc:"https://leetcode.com/problems/word-search/", co:["Microsoft","Amazon"], fu:"Now search thousands of words in the same grid — what structure changes everything? (Leads into Word Search II / Trie.)" },
+
+  // Dynamic Programming (8)
+  { id:"d65", g:"Dynamic Programming", t:"Coin Change", diff:"Medium", lc:"https://leetcode.com/problems/coin-change/", co:["Amazon","Google"], fu:"Why does greedy fail here? Give a concrete coin set where it breaks." },
+  { id:"d66", g:"Dynamic Programming", t:"Longest Increasing Subsequence", diff:"Medium", lc:"https://leetcode.com/problems/longest-increasing-subsequence/", co:["Google"], fu:"O(n²) is fine — now get O(n log n) with patience sorting. Can you also return the subsequence?" },
+  { id:"d67", g:"Dynamic Programming", t:"Word Break", diff:"Medium", lc:"https://leetcode.com/problems/word-break/", co:["Amazon"], fu:"Amazon asked the follow-up directly: return all valid sentences (Word Break II). Why does memoization matter there?" },
+  { id:"d68", g:"Dynamic Programming", t:"House Robber", diff:"Medium", lc:"https://leetcode.com/problems/house-robber/", co:["Amazon"], fu:"Houses are now in a circle — what two subproblems does that split into?" },
+  { id:"d69", g:"Dynamic Programming", t:"Longest Palindromic Substring", diff:"Medium", lc:"https://leetcode.com/problems/longest-palindromic-substring/", co:["Amazon","Microsoft"], fu:"Expand-around-center vs DP table — compare space. Have you heard of Manacher's? High-level idea only." },
+  { id:"d70", g:"Dynamic Programming", t:"Decode Ways", diff:"Medium", lc:"https://leetcode.com/problems/decode-ways/", co:["Meta","Microsoft"], fu:"What inputs return 0? Walk me through '100' and '230' — edge handling is the whole interview here." },
+  { id:"d71", g:"Dynamic Programming", t:"Maximum Subarray", diff:"Medium", lc:"https://leetcode.com/problems/maximum-subarray/", co:["Amazon","Microsoft"], fu:"Return the indices too. Then: what if the array is circular?" },
+  { id:"d72", g:"Dynamic Programming", t:"Best Time to Buy and Sell Stock", diff:"Easy", lc:"https://leetcode.com/problems/best-time-to-buy-and-sell-stock/", co:["Amazon","Google"], fu:"Now unlimited transactions. Then at most two. What's the general K-transaction recurrence?" },
+
+  // Design & Simulation (8)
+  { id:"d73", g:"Design & Simulation", t:"Insert Delete GetRandom O(1)", diff:"Medium", lc:"https://leetcode.com/problems/insert-delete-getrandom-o1/", co:["Meta","Amazon"], fu:"Why array + hashmap, and what's the swap-with-last trick on delete? Now allow duplicates." },
+  { id:"d74", g:"Design & Simulation", t:"Dot Product of Two Sparse Vectors", diff:"Medium", lc:"https://leetcode.com/problems/dot-product-of-two-sparse-vectors/", co:["Meta"], fu:"Meta phone screen favorite. One vector is far sparser than the other — two pointers or binary search? Defend it." },
+  { id:"d75", g:"Design & Simulation", t:"Nested List Weight Sum", diff:"Medium", lc:"https://leetcode.com/problems/nested-list-weight-sum/", co:["Meta"], fu:"Now invert the weights — deepest level gets weight 1 — in a single pass. How?" },
+  { id:"d76", g:"Design & Simulation", t:"Buildings With an Ocean View", diff:"Medium", lc:"https://leetcode.com/problems/buildings-with-an-ocean-view/", co:["Meta"], fu:"What if heights arrive as a stream from the left and you must answer at any point? Which direction of scan survives?" },
+  { id:"d77", g:"Design & Simulation", t:"Custom Sort String", diff:"Medium", lc:"https://leetcode.com/problems/custom-sort-string/", co:["Meta"], fu:"Counting sort vs comparator — which and why? What's the complexity in terms of both string lengths?" },
+  { id:"d78", g:"Design & Simulation", t:"Valid Word Abbreviation", diff:"Easy", lc:"https://leetcode.com/problems/valid-word-abbreviation/", co:["Meta"], fu:"Classic Meta opener. Which two edge cases fail most candidates? (Leading zeros, and consuming past the end.)" },
+  { id:"d79", g:"Design & Simulation", t:"Pow(x, n)", diff:"Medium", lc:"https://leetcode.com/problems/powx-n/", co:["Meta","Google"], fu:"Handle negative n — what breaks at INT_MIN? Iterative fast power, please." },
+  { id:"d80", g:"Design & Simulation", t:"Moving Average from Data Stream", diff:"Easy", lc:"https://leetcode.com/problems/moving-average-from-data-stream/", co:["Meta"], fu:"Now make it time-based (last 5 minutes) instead of last N values. What structure, and how do you evict?" },
+];
+
+const lld = [
+  { id:"l1", t:"Parking Lot", co:["Amazon"], fu:"Multiple vehicle types, pricing strategies, nearest-spot allocation. Probe: how do you add a new vehicle type without touching existing code?" },
+  { id:"l2", t:"Vending Machine (State Pattern)", co:["Amazon"], fu:"Asked at Amazon Feb 2026 as a leasing system: VendingMachine, LeaseAgreement, PaymentStrategy. Probe: model Idle / OutOfStock / Maintenance with the State pattern." },
+  { id:"l3", t:"Elevator System", co:["Microsoft"], fu:"Probe: scheduling algorithm for multiple elevators, direction state machine, and how requests are dispatched." },
+  { id:"l4", t:"Movie Ticket Booking (BookMyShow)", co:["Amazon"], fu:"Probe: two users click the same seat at the same millisecond — pessimistic vs optimistic locking, seat-hold TTL." },
+  { id:"l5", t:"Splitwise (Expense Sharing)", co:["Google"], fu:"Probe: simplify-debts algorithm, equal/exact/percent splits, and rounding correctness." },
+  { id:"l6", t:"Chess Game", co:["Microsoft"], fu:"Probe: piece hierarchy vs strategy for move validation, undo via Command pattern, check/checkmate detection." },
+  { id:"l7", t:"Snake and Ladder", co:["Amazon"], fu:"Probe: board as a map of jumps, dice abstraction for testability, N players." },
+  { id:"l8", t:"Tic Tac Toe (N x N)", co:["Google"], fu:"Probe: O(1) win detection per move using row/col/diagonal counters." },
+  { id:"l9", t:"Thread-Safe LRU Cache", co:["Amazon","Microsoft"], fu:"Probe: lock granularity — one big lock vs segmented; how do you avoid deadlock between map and list updates?" },
+  { id:"l10", t:"Rate Limiter (Library)", co:["Amazon","Meta"], fu:"Probe: token bucket vs sliding window log vs fixed window — implement one interface, swap algorithms via Strategy." },
+  { id:"l11", t:"Logger Framework", co:["Microsoft"], fu:"Probe: log levels, appender chain (Chain of Responsibility), async logging without losing messages on crash." },
+  { id:"l12", t:"Notification Service (LLD)", co:["Amazon"], fu:"Probe: Email/SMS/Push senders behind one interface, retry with backoff, Observer for subscribers." },
+  { id:"l13", t:"Food Delivery App (Swiggy/DoorDash LLD)", co:["Amazon"], fu:"Probe: order state machine (placed → assigned → picked → delivered), entity relationships, cancellation flows." },
+  { id:"l14", t:"Rider Matching for Quick Commerce", co:["Amazon"], fu:"Asked at Amazon recently. Probe: nearest-rider assignment, rider state transitions, what happens when a rider rejects." },
+  { id:"l15", t:"ATM Machine", co:["Microsoft"], fu:"Probe: State pattern for card/pin/transaction states, cash dispensing as a greedy denomination problem." },
+  { id:"l16", t:"Hotel Booking System (LLD)", co:["Amazon"], fu:"Probe: room inventory model, date-range overlap checks, avoiding double booking under concurrency." },
+  { id:"l17", t:"Car Rental System", co:["Amazon"], fu:"Probe: search by location/type/date, reservation lifecycle, pricing decorators (insurance, GPS add-ons)." },
+  { id:"l18", t:"Online Coding Judge (LLD)", co:["Google"], fu:"Probe: submission queue, sandboxed executor interface, verdict pipeline, plugging in new languages." },
+  { id:"l19", t:"Stack Overflow (Q&A)", co:["Amazon"], fu:"Probe: entities (Question, Answer, Comment, Vote), reputation events via Observer, search interface." },
+  { id:"l20", t:"In-Memory File System", co:["Google","Microsoft"], fu:"Probe: Composite pattern for files vs directories, path resolution, ls/mkdir/addContent APIs." },
+  { id:"l21", t:"Key-Value Store with TTL", co:["Amazon"], fu:"Probe: lazy vs active expiry, wheel timer, thread-safety of get-or-expire." },
+  { id:"l22", t:"Pub-Sub System (In-Process)", co:["Meta"], fu:"Probe: topic registry, consumer offset per subscriber, at-least-once delivery within a process." },
+  { id:"l23", t:"Job Scheduler (cron-like)", co:["Amazon","Google"], fu:"Probe: priority queue by next-run-time, recurring jobs, missed-run policy, worker pool." },
+  { id:"l24", t:"URL Shortener (LLD)", co:["Microsoft"], fu:"Probe: encoding strategy interface (base62 vs hash), collision handling, class design before scale talk." },
+  { id:"l25", t:"Payment Gateway Integration", co:["Amazon"], fu:"Probe: Strategy per provider (Stripe/PayPal), idempotency keys, retry-safe charge API." },
+  { id:"l26", t:"Coffee / Beverage Machine", co:["Microsoft"], fu:"Probe: recipe as composition of ingredients, inventory checks, concurrent dispensing from shared containers." },
+  { id:"l27", t:"Inventory Management", co:["Amazon"], fu:"Probe: reserve vs commit stock, oversell prevention, warehouse abstraction." },
+  { id:"l28", t:"Meeting Scheduler", co:["Microsoft","Google"], fu:"Probe: interval conflict detection per room, finding a common free slot across N calendars." },
+  { id:"l29", t:"Amazon Locker", co:["Amazon"], fu:"Probe: locker size matching, code generation and expiry, return flows." },
+  { id:"l30", t:"Traffic Signal Control", co:["Microsoft"], fu:"Probe: State pattern per signal, coordinating an intersection, pluggable timing strategies." },
+  { id:"l31", t:"Digital Wallet", co:["Amazon"], fu:"Probe: ledger-style balance (never a mutable float), idempotent transfers, transaction atomicity across accounts." },
+  { id:"l32", t:"Message Queue (Kafka-lite, single node)", co:["Meta","Amazon"], fu:"Probe: append-only log per topic, consumer groups with offsets, ack semantics." },
+  { id:"l33", t:"Database Connection Pool", co:["Microsoft"], fu:"Very Java-relevant. Probe: blocking borrow with timeout, validation on return, max/idle sizing, leak detection." },
+  { id:"l34", t:"Bounded Blocking Queue", co:["Meta","Google"], fu:"Probe: implement with locks + condition variables; why notifyAll vs notify; then compare with ArrayBlockingQueue internals." },
+  { id:"l35", t:"Swappable Data Access Layer", co:["Microsoft"], fu:"Asked at Microsoft Mar 2026: data source (DB/API/file) can change at runtime — design with DI + Factory + Strategy, loosely coupled." },
+  { id:"l36", t:"Offline Download Manager", co:["Amazon"], fu:"Asked at Amazon recently for a social app. Probe: download queue, pause/resume with ranged requests, storage eviction policy." },
+  { id:"l37", t:"Product Catalog & Order Pricing", co:["Amazon"], fu:"Asked at Amazon: product class hierarchy, related product types, compute total order price. Probe: discounts as decorators." },
+  { id:"l38", t:"Billing System", co:["Amazon"], fu:"Amazon onsite classic. Probe: metered usage aggregation, invoice generation, proration and plan changes." },
+  { id:"l39", t:"Library Management System", co:["Amazon"], fu:"Probe: book vs copy distinction, checkout/hold flows, fine calculation strategy." },
+  { id:"l40", t:"Cache with Pluggable Eviction (LRU/LFU/FIFO)", co:["Google","Microsoft"], fu:"Probe: one Cache interface, eviction policy as Strategy — then implement LFU in O(1)." },
+];
+
+const hld = [
+  { id:"h1", t:"URL Shortener (bit.ly)", co:["Amazon","Microsoft"], fu:"Probe: ID generation at scale, 100:1 read/write ratio, cache strategy, 301 vs 302 and analytics." },
+  { id:"h2", t:"Ticketmaster / Event Booking", co:["Meta"], fu:"Asked in a recent Meta E4 onsite. Probe: seat hold with TTL, virtual waiting room for hot events, no double-sell under load." },
+  { id:"h3", t:"YouTube / Video Platform", co:["Amazon"], fu:"Asked at Amazon HM round. Probe: upload pipeline, transcoding fan-out, CDN, high-concurrency likes/comments counters." },
+  { id:"h4", t:"Twitter / X Feed", co:["Meta"], fu:"Probe: fan-out on write vs read, celebrity problem, timeline cache sizing." },
+  { id:"h5", t:"Instagram", co:["Meta"], fu:"Probe: photo storage + metadata split, feed ranking hook, follower graph sharding." },
+  { id:"h6", t:"WhatsApp / Chat System", co:["Meta","Microsoft"], fu:"Probe: message ordering per conversation, delivery receipts state machine, online presence, E2E encryption at the boundary." },
+  { id:"h7", t:"Uber / Ride Matching", co:["Amazon"], fu:"Probe: driver location ingestion (geohash/QuadTree), matching latency budget, surge pricing data flow." },
+  { id:"h8", t:"Distributed Rate Limiter", co:["Amazon","Meta"], fu:"Probe: Redis + Lua atomicity, sliding window counter accuracy vs memory, what happens when Redis is down." },
+  { id:"h9", t:"Web Crawler", co:["Google"], fu:"Probe: politeness per domain, URL frontier prioritization, dedup with bloom filters, trap detection." },
+  { id:"h10", t:"Typeahead / Autocomplete", co:["Meta","Google"], fu:"Probe: trie vs precomputed top-K per prefix, update freshness, personalization layer." },
+  { id:"h11", t:"Dropbox / File Sync", co:["Microsoft"], fu:"Probe: chunking + content hashing, delta sync, conflict resolution, metadata vs block storage." },
+  { id:"h12", t:"Google Docs (Collaborative Editing)", co:["Google"], fu:"Probe: OT vs CRDT trade-offs, cursor presence, offline edits merging." },
+  { id:"h13", t:"News Feed", co:["Meta"], fu:"Probe: feed generation SLA, ranking service integration, cache invalidation when a post is deleted." },
+  { id:"h14", t:"Notification System (HLD)", co:["Amazon"], fu:"Probe: multi-channel fan-out, rate limiting per user, dedup, priority lanes for OTPs." },
+  { id:"h15", t:"Payment System (Stripe-like)", co:["Amazon","Meta"], fu:"Probe: idempotency end to end, double-entry ledger, reconciliation with PSPs, exactly-once illusion." },
+  { id:"h16", t:"Yelp / Proximity Search", co:["Meta"], fu:"Probe: geospatial index choice (geohash vs QuadTree vs S2), search + filter combination, review write path." },
+  { id:"h17", t:"Gaming Leaderboard", co:["Meta"], fu:"Asked at Meta — candidate over-engineered top-K; interviewer wanted a Redis sorted set. Probe: knowing when simple is correct." },
+  { id:"h18", t:"Distributed Message Queue (Kafka)", co:["Amazon","Microsoft"], fu:"Probe: partitioning and ordering guarantees, consumer group rebalancing, at-least-once vs exactly-once." },
+  { id:"h19", t:"Real-Time Error Log Monitoring", co:["Amazon"], fu:"Asked at Amazon Feb 2026: 1M+ writes/sec, sub-second alerting. Kafka → Flink windowed aggregation → Elasticsearch. Probe: backpressure when consumers lag (they spent 15 min here)." },
+  { id:"h20", t:"Metrics Monitoring & Alerting", co:["Amazon","Google"], fu:"Probe: time-series DB write path, downsampling/rollups, alert evaluation without thundering herds." },
+  { id:"h21", t:"Post / Keyword Search", co:["Meta"], fu:"Asked in Meta E4 onsite. Probe: inverted index build, sharding, hot partitions, cache invalidation on edits." },
+  { id:"h22", t:"Ad Click Aggregator", co:["Meta","Google"], fu:"Probe: streaming aggregation windows, late events, exactly-once counting for billing." },
+  { id:"h23", t:"Tinder / Dating App", co:["Meta"], fu:"Probe: recommendation queue precomputation, swipe ingestion volume, match detection consistency." },
+  { id:"h24", t:"Live Comments (Facebook Live)", co:["Meta"], fu:"Probe: fan-out over websockets/SSE, per-video channel scaling, backpressure on viral streams." },
+  { id:"h25", t:"Flash Sale / High-Concurrency Checkout", co:["Amazon"], fu:"Probe: inventory decrement without oversell, queue-based admission, cart hold expiry." },
+  { id:"h26", t:"Hotel Booking (Booking.com)", co:["Amazon"], fu:"Probe: availability search across date ranges, reservation consistency, cross-partner inventory sync." },
+  { id:"h27", t:"Distributed Cache (Redis-like)", co:["Google","Microsoft"], fu:"Probe: consistent hashing, replication and failover, cache stampede protection." },
+  { id:"h28", t:"Distributed Job Scheduler", co:["Amazon","Google"], fu:"Probe: exactly-once execution, leader election, misfire handling, priority + delayed jobs." },
+  { id:"h29", t:"Key-Value Store (DynamoDB-style)", co:["Amazon"], fu:"Probe: consistent hashing + vnodes, quorum reads/writes (R+W>N), vector clocks vs LWW." },
+  { id:"h30", t:"Object Storage (S3)", co:["Amazon","Microsoft"], fu:"Probe: metadata service vs blob placement, erasure coding vs replication, multipart uploads." },
+  { id:"h31", t:"Google Maps / Navigation", co:["Google"], fu:"Probe: map tiling, contraction hierarchies for routing, live traffic ingestion." },
+  { id:"h32", t:"Stock Exchange / Robinhood", co:["Amazon"], fu:"Probe: order matching engine, price-time priority, market data fan-out latency. (You'll enjoy this one.)" },
+  { id:"h33", t:"Online Coding Platform (LeetCode)", co:["Amazon"], fu:"Asked at an Amazon HM round. Probe: sandboxed execution at scale, traffic bursts during contests, monolith vs microservices reasoning." },
+  { id:"h34", t:"Video Conferencing (Zoom)", co:["Microsoft"], fu:"Probe: SFU vs mesh vs MCU, TURN/STUN at the edges, adaptive bitrate." },
+  { id:"h35", t:"CDN Design", co:["Google","Amazon"], fu:"Probe: cache hierarchy, origin shielding, invalidation propagation, request routing (anycast vs DNS)." },
+  { id:"h36", t:"Distributed Unique ID Generator", co:["Meta","Amazon"], fu:"Probe: Snowflake layout, clock skew handling, sortability requirements from downstream." },
+  { id:"h37", t:"Food Delivery (DoorDash)", co:["Amazon"], fu:"Probe: three-sided marketplace flows, ETA prediction inputs, dispatch optimization." },
+  { id:"h38", t:"E-commerce Order Pipeline", co:["Amazon"], fu:"Probe: order saga across payment/inventory/shipping, compensating transactions, outbox pattern." },
+  { id:"h39", t:"Spotify / Music Streaming", co:["Meta"], fu:"Probe: audio chunk delivery + CDN, playlist metadata scale, offline sync licensing constraints." },
+  { id:"h40", t:"Strava / Activity Tracking", co:["Meta"], fu:"Probe: GPS point ingestion, route matching, leaderboard segments, privacy zones." },
+];
+
+
+
+const TABS=[{key:"dsa",label:"DSA",items:dsa,sub:"80 questions"},{key:"lld",label:"LLD",items:lld,sub:"40 designs"},{key:"hld",label:"HLD",items:hld,sub:"40 systems"}];
+const FILTERS=[["all","All"],["todo","To do"],["review","\u2691 Review"],["done","\u2713 Done"]];
+const diffColor={Easy:"#4FBF8B",Medium:"#E8A93D",Hard:"#E06C6C"};
+const KEY="prep160-status-v1";
+
+let status={};
+try{status=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){status={}}
+let tab="dsa", filter="all", closed={};
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(status))}catch(e){console.error("Could not save progress",e)}}
+function toggle(id,val){ if(status[id]===val) delete status[id]; else status[id]=val; save(); render(); }
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+
+function card(q,isDsa){
+  const st=status[q.id];
+  const cls="card"+(st===D?" done":st===R?" review":"");
+  const bl=isDsa&&!st?`style="border-left-color:${diffColor[q.diff]}"`:"";
+  const title=isDsa
+    ?`<a class="title" href="${q.lc}" target="_blank" rel="noreferrer">${esc(q.t)} \u2197</a>`
+    :`<span class="title">${esc(q.t)}</span>`;
+  const diff=isDsa?`<span class="pill" style="color:${diffColor[q.diff]};border:1px solid ${diffColor[q.diff]}44">${q.diff}</span>`:"";
+  const cos=q.co.map(c=>`<span class="pill co">${c}</span>`).join("");
+  return `<div class="${cls}" ${bl}>
+    <div class="row">
+      <div style="min-width:0">${title}<div class="tags">${diff}${cos}</div></div>
+      <div class="btns">
+        <button class="btn ${st===D?"don":""}" aria-label="Mark done" onclick="toggle('${q.id}','${D}')">\u2713</button>
+        <button class="btn ${st===R?"rev":""}" aria-label="Mark for review" onclick="toggle('${q.id}','${R}')">\u2691</button>
+      </div>
+    </div>
+    <div class="fu"><b>${isDsa?"INTERVIEWER FOLLOW-UP \u00b7 ":"WHAT THEY PROBE \u00b7 "}</b>${esc(q.fu)}</div>
+  </div>`;
+}
+
+function render(){
+  const active=TABS.find(t=>t.key===tab);
+  document.getElementById("tabs").innerHTML=TABS.map(t=>
+    `<button class="tab ${t.key===tab?"on":""}" onclick="tab='${t.key}';filter='all';render()"><b>${t.label}</b><span>${t.sub}</span></button>`).join("");
+  document.getElementById("filters").innerHTML=FILTERS.map(([k,l])=>
+    `<button class="chip ${filter===k?"on":""}" onclick="filter='${k}';render()">${l}</button>`).join("");
+
+  let done=0,rev=0;
+  active.items.forEach(q=>{if(status[q.id]===D)done++;if(status[q.id]===R)rev++});
+  const total=active.items.length;
+  document.getElementById("nDone").textContent=`\u2713 ${done} done`;
+  document.getElementById("nRev").textContent=`\u2691 ${rev} to review`;
+  document.getElementById("nLeft").textContent=`${total-done-rev} left`;
+  document.getElementById("barG").style.width=(done/total*100)+"%";
+  document.getElementById("barA").style.width=(rev/total*100)+"%";
+
+  const visible=active.items.filter(q=>{
+    if(filter==="done")return status[q.id]===D;
+    if(filter==="review")return status[q.id]===R;
+    if(filter==="todo")return !status[q.id];
+    return true;
+  });
+
+  let html="";
+  if(tab==="dsa"){
+    const groups={};
+    visible.forEach(q=>{(groups[q.g]=groups[q.g]||[]).push(q)});
+    for(const g in groups){
+      const all=active.items.filter(q=>q.g===g);
+      const gd=all.filter(q=>status[q.id]===D).length;
+      const open=!closed[g];
+      html+=`<button class="ghead" onclick="closed['${g.replace(/'/g,"\\'")}']=${open};render()"><b>${g}</b><span>${gd}/${all.length} ${open?"\u25be":"\u25b8"}</span></button>`;
+      if(open) html+=groups[g].map(q=>card(q,true)).join("");
+    }
+  } else {
+    html=visible.map(q=>card(q,false)).join("");
+  }
+  if(!visible.length) html=`<div class="empty">Nothing here yet \u2014 mark questions as done or for review and they'll show up under this filter.</div>`;
+  document.getElementById("list").innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>
